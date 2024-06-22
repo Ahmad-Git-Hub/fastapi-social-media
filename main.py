@@ -35,6 +35,11 @@ def root():
 def get_posts():
     return {"data": my_posts}
 
+@app.get("/posts/latest")
+def get_latest():
+    post = my_posts[len(my_posts)-1]
+    return {'latest post:': post}
+
 
 @app.get("/posts/{id}")
 def get_post(id: int):
