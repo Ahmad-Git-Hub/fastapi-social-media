@@ -15,9 +15,18 @@ class Post(BaseModel):
     rating: Optional[int] = None
 
 
-my_posts = [{"id": 1, "title": "Why people leave thier countries!", 
-            "content": "let's find out what happened during the 90's",
-            "published": True, "rating": 4}]
+my_posts = [{"id": 1, "title": "ttitle of post 1", 
+            "content": "content of post 1",
+            "published": True, "rating": 4},
+            {"id": 2, "title": "ttitle of post 2", 
+            "content": "content of post 2",
+            "published": True, "rating": 5},
+            {"id": 3, "title": "ttitle of post 3", 
+            "content": "content of post 3",
+            "published": True, "rating": 5},
+            {"id": 4, "title": "ttitle of post 4", 
+            "content": "content of post 4",
+            "published": True, "rating": 3}]
 
 def find_post(id: int):
     for post in my_posts:
