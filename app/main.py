@@ -29,21 +29,21 @@ def root():
     return {"message": "FastApi is here!"}
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=schemas.PostResponse)
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
     posts = db.query(models.Post).all()
-    return {"posts": posts}
+    return posts
 
 
-@app.get("/posts/latest")
+@app.get("/posts/latest", response_model=schemas.PostResponse)
 def get_latest(db: Session = Depends(get_db)):
      # cursor.execute("""SELECT * FROM posts ORDER BY created_at DESC LIMIT 1""")
     # latest_post = cursor.fetchone()
-    latest_post = db.query(models.Post).order_by(models.Post.created_at.desc()).limit(1).first()   
+    latest_post = db.query(models.Post).order_by(models.Post.created_at.desc()).first()  
     if latest_post:
-        return {"latest_post": latest_post}
+        return latest_post
     else:
          raise HTTPException(
              status_code = status.HTTP_404_NOT_FOUND,
@@ -52,13 +52,13 @@ def get_latest(db: Session = Depends(get_db)):
 
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.PostResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""", (id,))
     # post = cursor.fetchone()
     post = db.query(models.Post).filter_by(id=id).first()
     if post:
-        return {"post": post}
+        return post
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -66,7 +66,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
             )
     
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """,
     #                (post.title, post.content, post.published))
@@ -76,7 +76,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {"data": new_post}
+    return new_post
 
 
 @app.delete("/posts/{id}")
@@ -96,8 +96,8 @@ def delete_post(id: int,  db: Session = Depends(get_db)):
                               detail= f"post with id {id} does not exist!")     
     
 
-
-@app.put("/posts/{id}")
+# , response_model=schemas.PostResponse
+@app.put("/posts/{id}", response_model=schemas.PostResponse)
 def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(get_db)):
     # cursor.execute("""UPDATE posts
     #                SET title = %s, content = %s, published = %s
@@ -119,7 +119,7 @@ def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends
     post_query.update(updated_post.model_dump(exclude_unset=True), synchronize_session=False)
     db.commit()
     db.refresh(retrieved_post)
-    return {"updated post": updated_post.model_dump(exclude_unset=True)}
+    return retrieved_post
     
 
      
