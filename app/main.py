@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 import psycopg
 import time
@@ -29,7 +30,7 @@ def root():
     return {"message": "FastApi is here!"}
 
 
-@app.get("/posts", response_model=schemas.PostResponse)
+@app.get("/posts", response_model=List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
@@ -121,5 +122,13 @@ def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends
     db.refresh(retrieved_post)
     return retrieved_post
     
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+def create_user (user: schemas.UserCreate, db: Session = Depends(get_db)):
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user     
 
      
