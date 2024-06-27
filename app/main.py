@@ -3,13 +3,11 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends
 import psycopg
 import time
 from sqlalchemy.orm import Session
-from . import models, schemas, variables
+from . import models, schemas, variables, utilities
 from .database import engine, get_db
-from passlib.context import CryptContext
 
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Creates the tables
 models.Base.metadata.create_all(bind=engine)
 
@@ -131,7 +129,7 @@ def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends
 @app.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user (user: schemas.UserCreate, db: Session = Depends(get_db)):
     # hash user password
-    user.password = pwd_context.hash(user.password)
+    user.password = utilities.hash_password(user.password)
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
