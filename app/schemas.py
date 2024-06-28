@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
-# Schema of what should client send to path operation
+
 class PostBaseSchema(BaseModel):
     title: str
     content: str
@@ -12,7 +12,6 @@ class PostInputSchema(PostBaseSchema):
     pass
 
 
-# Schema of what response should look like
 class PostResponseSchema(PostBaseSchema):
     id: int
     created_at: datetime

@@ -6,16 +6,17 @@ from app.database import get_db
 
 
 router = APIRouter(
-    prefix="/posts"
+    prefix="/posts",
+    tags = ['Posts']
 )
 
-@router.get("/", response_model=List[schemas.PostResponse])
+@router.get("/", response_model=List[schemas.PostResponseSchema])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return posts
 
 
-@router.get("/latest", response_model=schemas.PostResponse)
+@router.get("/latest", response_model=schemas.PostResponseSchema)
 def get_latest(db: Session = Depends(get_db)):
     latest_post = db.query(models.Post).order_by(models.Post.created_at.desc()).first()  
     if latest_post:
@@ -28,7 +29,7 @@ def get_latest(db: Session = Depends(get_db)):
 
 
 
-@router.get("/{id}", response_model=schemas.PostResponse)
+@router.get("/{id}", response_model=schemas.PostResponseSchema)
 def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter_by(id=id).first()
     if post:
@@ -40,8 +41,8 @@ def get_post(id: int, db: Session = Depends(get_db)):
             )
     
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostInputSchema)
+def create_post(post: schemas.PostInputSchema, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)
     db.commit()
@@ -61,8 +62,8 @@ def delete_post(id: int,  db: Session = Depends(get_db)):
                               detail= f"post with id {id} does not exist!")     
     
 
-@router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(get_db)):
+@router.put("/{id}", response_model=schemas.PostInputSchema)
+def update_post(id: int, updated_post: schemas.PostInputSchema, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter_by(id=id)
     retrieved_post = post_query.first()
     if retrieved_post is None:
