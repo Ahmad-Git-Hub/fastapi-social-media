@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
-from app import models, schemas
+from app import models, oauth2, schemas
 from app.database import get_db
 
 
@@ -11,26 +11,13 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.PostResponseSchema])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db),  user: models.User = Depends(oauth2.get_user())):
     posts = db.query(models.Post).all()
     return posts
 
 
-@router.get("/latest", response_model=schemas.PostResponseSchema)
-def get_latest(db: Session = Depends(get_db)):
-    latest_post = db.query(models.Post).order_by(models.Post.created_at.desc()).first()  
-    if latest_post:
-        return latest_post
-    else:
-         raise HTTPException(
-             status_code = status.HTTP_404_NOT_FOUND,
-             detail = f"No post was found!"
-             )
-
-
-
 @router.get("/{id}", response_model=schemas.PostResponseSchema)
-def get_post(id: int, db: Session = Depends(get_db)):
+def get_post(id: int, db: Session = Depends(get_db), user: models.User = Depends(oauth2.get_user())):
     post = db.query(models.Post).filter_by(id=id).first()
     if post:
         return post
@@ -42,7 +29,8 @@ def get_post(id: int, db: Session = Depends(get_db)):
     
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostInputSchema)
-def create_post(post: schemas.PostInputSchema, db: Session = Depends(get_db)):
+def create_post(post: schemas.PostInputSchema, db: Session = Depends(get_db), 
+                user: models.User = Depends(oauth2.get_user())):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)
     db.commit()
@@ -51,7 +39,7 @@ def create_post(post: schemas.PostInputSchema, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}")
-def delete_post(id: int,  db: Session = Depends(get_db)):
+def delete_post(id: int,  db: Session = Depends(get_db),  user: models.User = Depends(oauth2.get_user())):
     post_to_delete = db.query(models.Post).filter_by(id=id).first()
     if post_to_delete:
         db.delete(post_to_delete)
@@ -63,7 +51,8 @@ def delete_post(id: int,  db: Session = Depends(get_db)):
     
 
 @router.put("/{id}", response_model=schemas.PostInputSchema)
-def update_post(id: int, updated_post: schemas.PostInputSchema, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: schemas.PostInputSchema, db: Session = Depends(get_db),
+                user: models.User = Depends(oauth2.get_user())):
     post_query = db.query(models.Post).filter_by(id=id)
     retrieved_post = post_query.first()
     if retrieved_post is None:
