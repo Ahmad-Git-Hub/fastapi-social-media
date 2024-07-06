@@ -33,7 +33,7 @@ def get_user(
     db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter_by(user_id=user_id).first()
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with id {user_id} was not found!"

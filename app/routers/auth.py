@@ -13,7 +13,7 @@ def login(
     db: Session = Depends(database.get_db)
 ):
     user = db.query(models.User).filter_by(email=user_credentials.username).first()
-    if not user:
+    if user is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials")
     
     if not utilities.verify_passwords(user_credentials.password, user.password):
