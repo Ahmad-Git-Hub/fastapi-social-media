@@ -59,7 +59,7 @@ def delete_post(
     
     if post_to_delete.user_id != current_user.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detial="Not authorized to perform delete")
+                            detail="Not authorized to perform delete")
     db.delete(post_to_delete)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)          
@@ -79,7 +79,7 @@ def update_post(
     
     if post_to_update.user_id != current_user.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detial="Not authorized to perform update")
+                            detail="Not authorized to perform update")
     
     post_query.update(updated_post.model_dump(exclude_unset=True), synchronize_session=False)
     db.commit()
