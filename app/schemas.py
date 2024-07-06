@@ -14,7 +14,7 @@ class PostInputSchema(PostBaseSchema):
 
 
 class PostResponseSchema(PostBaseSchema):
-    id: int
+    post_id: int
     created_at: datetime
 
     class Config:
@@ -22,7 +22,7 @@ class PostResponseSchema(PostBaseSchema):
 
 
 class UserResponseSchema(BaseModel):
-    id: int
+    user_id: int
     email: EmailStr
     created_at: datetime
 
@@ -47,7 +47,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: Optional[str] = None
+    user_id: Optional[int] = None
 
 
 
