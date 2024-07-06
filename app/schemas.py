@@ -14,6 +14,7 @@ class PostInputSchema(PostBaseSchema):
 
 
 class PostResponseSchema(PostBaseSchema):
+    user_id: int
     post_id: int
     created_at: datetime
 
