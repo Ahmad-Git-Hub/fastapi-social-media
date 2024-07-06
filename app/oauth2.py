@@ -25,26 +25,26 @@ def create_access_token(data: dict):
 def verify_access_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, variables.SECRET, algorithms=[ALGORITHM])
-        id: str = payload.get('user_id')
-        if id is None:
+        user_id: str = payload.get('user_id')
+        if user_id is None:
             raise credentials_exception
-        token_data = schemas.TokenData(id=str(id))   
+        verified_token = schemas.TokenData(user_id=int(user_id))   
     except PyJWTError:
         raise credentials_exception
-    return token_data
+    return verified_token
     
 
 def get_current_user(token : str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):    
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                          detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+                                          detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     verified_token = verify_access_token(token, credentials_exception)
 
-    id = int(verified_token.id)
-    user = db.query(models.User).filter_by(id=id).first()
+    user_id = verified_token.user_id
+    user = db.query(models.User).filter_by(user_id=user_id).first()
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail = f"User with id {id} was not found!"
+            detail = f"User with id {user_id} was not found!"
             )
     return user
