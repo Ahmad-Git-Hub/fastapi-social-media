@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, conint
+from typing_extensions import Annotated
 
 
 class UserResponseSchema(BaseModel):
@@ -49,5 +50,11 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     user_id: Optional[int] = None
 
+
+class Vote(BaseModel):
+    post_id: int
+    dir: Annotated[int, Field(strict=True,le=1)]
+
+    
 
 
