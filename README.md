@@ -31,7 +31,6 @@ A robust REST API for a social media platform built with FastAPI, featuring user
 - **Pydantic**: Data validation using Python type annotations
 - **passlib**: Password hashing
 - **python-jose**: JWT token handling
-- **Docker**: Containerization
 
 ## 📋 Prerequisites
 
